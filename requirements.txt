@@ -1,0 +1,8 @@
+streamlit
+python-docx
+pdf2image
+pytesseract
+openai
+spacy
+opencv-python
+numpy
