@@ -13,6 +13,7 @@ import spacy
 import os
 import cv2
 import numpy as np
+import pandas as pd
 
 # Set up logging for error handling
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -190,6 +191,11 @@ def compare_tables(old_table, new_table):
 def display_table_side_by_side(old_table, new_table):
     table_diff, changes = compare_tables(old_table, new_table)
 
+    # Check lengths of tables and table_diff to debug
+    print(f"Old Table Length: {len(old_table)}")
+    print(f"New Table Length: {len(new_table)}")
+    print(f"Table Diff Length: {len(table_diff)}")
+
     # Display tables side by side in Streamlit
     col1, col2 = st.columns(2)
     col1.markdown("**Old Table**")
@@ -212,14 +218,25 @@ def display_table_side_by_side(old_table, new_table):
         new_row_cells = [f"<div style='padding:4px'>{row_number}"] + [f"<div style='padding:4px'>{cell}</div>" for cell
                                                                       in new_row]
 
-        # Apply background color for changed cells
-        for j, (old_cell, new_cell, tag) in enumerate(table_diff[i]):
-            if tag == "replace":
-                old_row_cells[1 + j] = f"<div style='padding:4px;background-color:#ffcccc'>{old_cell}</div>"
-                new_row_cells[1 + j] = f"<div style='padding:4px;background-color:#cce5ff'>{new_cell}</div>"
-            else:
-                old_row_cells[1 + j] = f"<div style='padding:4px'>{old_cell}</div>"
-                new_row_cells[1 + j] = f"<div style='padding:4px'>{new_cell}</div>"
+        # Apply background color for changed cells (only if table_diff exists for this row)
+        if i < len(table_diff):
+            # Ensure table_diff[i] has the expected structure
+            if len(table_diff[i]) != len(old_row):  # Ensure the number of columns match
+                print(f"Mismatch in row {i}: old_row length = {len(old_row)}, table_diff[i] length = {len(table_diff[i])}")
+
+            for j, (old_cell, new_cell, tag) in enumerate(table_diff[i]):
+                # Bounds checking for row and column indices
+                if j >= len(old_row) or j >= len(new_row):
+                    print(f"Index {j} out of bounds for row {i}: old_row length = {len(old_row)}, new_row length = {len(new_row)}")
+                    continue  # Skip this iteration if we hit an out-of-bounds error
+
+                # Apply the diff and color change
+                if tag == "replace":
+                    old_row_cells[1 + j] = f"<div style='padding:4px;background-color:#ffcccc'>{old_cell}</div>"
+                    new_row_cells[1 + j] = f"<div style='padding:4px;background-color:#cce5ff'>{new_cell}</div>"
+                else:
+                    old_row_cells[1 + j] = f"<div style='padding:4px'>{old_cell}</div>"
+                    new_row_cells[1 + j] = f"<div style='padding:4px'>{new_cell}</div>"
 
         # Ensure that both tables align properly, even when rows are missing
         col1.markdown(" | ".join(old_row_cells), unsafe_allow_html=True)
@@ -230,6 +247,11 @@ def display_table_side_by_side(old_table, new_table):
     st.info(f"**Table Comparison Similarity:** {similarity:.2f}% — {changes['replace']} replacements")
 
     return changes
+
+
+
+
+
 
 
 # ------------------------
