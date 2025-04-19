@@ -25,13 +25,13 @@ def handle_error(error_message):
     st.error(error_message)
 
 
-
 # Load NLP model
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
     import subprocess
     import sys
+
     subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
     nlp = spacy.load("en_core_web_sm")
 
@@ -715,4 +715,3 @@ if old_file and new_file:
             st.error(f"Error: {str(e)}")
 else:
     st.info("📥 Please upload both documents to begin comparison.")
-
