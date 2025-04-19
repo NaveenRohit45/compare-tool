@@ -708,3 +708,4 @@ if old_file and new_file:
             st.error(f"Error: {str(e)}")
 else:
     st.info("📥 Please upload both documents to begin comparison.")
+    
