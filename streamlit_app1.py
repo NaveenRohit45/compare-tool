@@ -572,26 +572,8 @@ Instructions for the AI:
 # ------------------------
 
 def generate_ai_summary(old_lines, new_lines, changes):
-    """Generate an AI-powered summary of document changes."""
-    try:
-        entities_diff = get_named_entities_diff(old_lines, new_lines)
-        prompt = create_summary_prompt(old_lines, new_lines, changes, entities_diff)
-
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a professional document analyst. Summarize changes concisely."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,  # Lower for more factual outputs
-            max_tokens=300
-        )
-
-        return response.choices[0].message['content'].strip()
-
-    except Exception as e:
-        logging.error(f"AI summary failed: {str(e)}")
-        return f"⚠️ Summary unavailable due to error: {str(e)}"
+    """Placeholder for future AI integration"""
+    return "🔧 AI summary feature is currently disabled. We'll implement this soon with enhanced analysis!"
 
 
 # ------------------------
@@ -640,6 +622,22 @@ if dark_mode:
     </style>
     """, unsafe_allow_html=True)
 
+    # ===== ADD THIS NEW SIDEBAR SECTION =====
+    with st.sidebar:
+        st.markdown("### 🛠 Feature Roadmap")
+        st.markdown("""
+        <style>
+            .feature-item {
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+            }
+        </style>
+        <div class="feature-item">✓ Core comparison engine</div>
+        <div class="feature-item">✓ Table/entity analysis</div>
+        <div class="feature-item">◌ AI summary (Q3 2024)</div>
+        """, unsafe_allow_html=True)
+    # ===== END OF NEW SECTION =====
+
 doc_type = st.radio("Choose document type", ["Word", "PDF"], horizontal=True)
 ocr_lang = st.selectbox("OCR Language (PDF only)", ["eng", "spa", "fra", "deu"])
 max_pages = st.slider("Pages to process (PDF only)", 1, 20, 5)
@@ -686,17 +684,25 @@ if old_file and new_file:
                         st.write("**Replaced:**", [f"{old} → {new}" for old, new, _ in entities_diff["replaced"]])
 
                 with tab3:
-                    # AI Summary
-                    st.markdown("### 🤖 AI-Powered Summary")
-                    ai_summary = generate_ai_summary(o_lines, n_lines, stats)
-                    st.success(ai_summary)
+                    st.markdown("### 🤖 AI Summary (Coming Soon)")
+                    st.info("""
+                    We're working on an advanced AI summary feature that will:
+                    - Highlight key changes automatically
+                    - Explain impacts in business terms
+                    - Suggest action items
 
-                    if st.button("📥 Export Summary as TXT"):
-                        st.download_button(
-                            label="Download Summary",
-                            data=ai_summary,
-                            file_name="comparison_summary.txt"
-                        )
+                    **Try these current features:**
+                    - Text differences (left tab)
+                    - Table comparisons (below)
+                    - Entity tracking (previous tab)
+                    """)
+
+                    # Show basic stats from the comparison
+                    st.metric("Total Changes", sum(stats.values()))
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric("Replacements", stats['replace'])
+                    col2.metric("Additions", stats['insert'])
+                    col3.metric("Deletions", stats['delete'])
                 # ====== END OF TABBED UI ======
 
             else:  # PDF handling
@@ -708,4 +714,4 @@ if old_file and new_file:
             st.error(f"Error: {str(e)}")
 else:
     st.info("📥 Please upload both documents to begin comparison.")
-    
+
