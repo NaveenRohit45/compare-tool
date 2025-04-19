@@ -25,6 +25,7 @@ def handle_error(error_message):
     st.error(error_message)
 
 
+
 # Load NLP model
 try:
     nlp = spacy.load("en_core_web_sm")
