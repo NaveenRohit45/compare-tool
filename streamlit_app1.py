@@ -35,8 +35,9 @@ except OSError:
     nlp = spacy.load("en_core_web_sm")
 
 # Set OpenAI API key
-openai.api_key = os.getenv(
-    "OPENAI_API_KEY") or "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"  # Replace with your key
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# openai.api_key = os.getenv(
+#     "OPENAI_API_KEY") or "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"  # Replace with your key
 
 
 def extract_entities(text):
